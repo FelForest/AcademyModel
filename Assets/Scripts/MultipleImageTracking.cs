@@ -59,12 +59,9 @@ public class MultipleImageTracking : MonoBehaviour
 
         if (trackedImage.trackingState == TrackingState.Tracking)
         {
-            if(blueprint.transform.position == trackedImage.transform.position)
-            {
                 trackedObject.transform.position = trackedImage.transform.position;
                 trackedObject.transform.rotation = trackedImage.transform.rotation;
                 trackedObject.SetActive(true);
-            }
         }
         else
         {
