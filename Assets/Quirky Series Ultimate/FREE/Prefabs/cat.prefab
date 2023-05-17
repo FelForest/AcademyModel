@@ -468,7 +468,7 @@ GameObject:
   - component: {fileID: 3961114142717461643}
   - component: {fileID: 3701583169001772672}
   m_Layer: 0
-  m_Name: Taipan
+  m_Name: cat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
