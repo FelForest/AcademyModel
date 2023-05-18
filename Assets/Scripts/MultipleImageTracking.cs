@@ -16,10 +16,15 @@ public class MultipleImageTracking : MonoBehaviour
     public Image blueprint;
     public float margin;
     public Text PositionCheck;
+
+    bool ImagePositionCorrect;
+    bool a;
     private void Awake()
     {
         ARTrackedImageManager = GetComponent<ARTrackedImageManager>();
         margin = 0.5f;
+        ImagePositionCorrect = false;
+        a = false;
         //Debug.Log(margin);
         foreach (GameObject prefab in Objs)
         {
@@ -39,47 +44,62 @@ public class MultipleImageTracking : MonoBehaviour
         ARTrackedImageManager.trackedImagesChanged -= OnTrackedImagesChanged;
     }
 
+    private void Update()
+    {
+        if (blueprint.transform.position.x < margin && blueprint.transform.position.x > -margin && blueprint.transform.position.y < margin && blueprint.transform.position.y > -margin)
+        {
+            ImagePositionCorrect = true;
+        }
+        else
+        {
+            ImagePositionCorrect = false;
+        }
+    }
     void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs eventArgs)
     {
         foreach (var trackedImage in eventArgs.added)
         {
-            UpdateImage(trackedImage);
+            if (ImagePositionCorrect)
+            {
+                a = true;
+            }
         }
 
         foreach (var trackedImage in eventArgs.updated)
         {
-            UpdateImage(trackedImage);
+            if (ImagePositionCorrect)
+            {
+                a = true;
+                UpdateImage(trackedImage);
+            }
+            else if (a)
+            {
+                UpdateImage(trackedImage);
+            }
         }
 
         foreach (var trackedImage in eventArgs.removed)
         {
             spawnedObjs[trackedImage.name].SetActive(false);
+            a = false;
         }
     }
 
     private void UpdateImage(ARTrackedImage trackedImage)
     {
         GameObject trackedObject = spawnedObjs[trackedImage.referenceImage.name];
-        bool objectSetActive = false;
+
+        PositionCheck.text = trackedImage.transform.position.x.ToString() + " : " + trackedImage.transform.position.y.ToString();
 
         if (trackedImage.trackingState == TrackingState.Tracking)
         {
-            PositionCheck.text = trackedImage.transform.position.x.ToString() + " : " + trackedImage.transform.position.y.ToString();
-            if (blueprint.transform.position.x <= trackedImage.transform.position.x + margin && blueprint.transform.position.x >= trackedImage.transform.position.x - margin && blueprint.transform.position.y <= trackedImage.transform.position.y + margin && blueprint.transform.position.y >= trackedImage.transform.position.y - margin)
-            {
-                objectSetActive = true;
-            }
-            if (objectSetActive)
-            {
-                trackedObject.transform.position = trackedImage.transform.position;
-                trackedObject.transform.rotation = trackedImage.transform.rotation;
-                trackedObject.SetActive(true);
-            }
+            trackedObject.transform.position = trackedImage.transform.position;
+            trackedObject.transform.rotation = trackedImage.transform.rotation;
+            trackedObject.SetActive(true);
         }
         else
         {
             trackedObject.SetActive(false);
-            objectSetActive = false;
         }
     }
 }
