@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
+using UnityEngine.UI;
 
 public class MultipleImageTracking : MonoBehaviour
 {
@@ -12,10 +13,14 @@ public class MultipleImageTracking : MonoBehaviour
     private Dictionary<string, GameObject> spawnedObjs = new Dictionary<string, GameObject>();
     private ARTrackedImageManager ARTrackedImageManager;
 
-    public GameObject blueprint;
+    public Image blueprint;
+    public float margin;
+    public Text PositionCheck;
     private void Awake()
     {
         ARTrackedImageManager = GetComponent<ARTrackedImageManager>();
+        margin = 100f;
+        //Debug.Log(margin);
         foreach (GameObject prefab in Objs)
         {
             GameObject clone = Instantiate(prefab);
@@ -59,9 +64,10 @@ public class MultipleImageTracking : MonoBehaviour
 
         if (trackedImage.trackingState == TrackingState.Tracking)
         {
-                trackedObject.transform.position = trackedImage.transform.position;
-                trackedObject.transform.rotation = trackedImage.transform.rotation;
-                trackedObject.SetActive(true);
+            PositionCheck.text = trackedImage.transform.position.x.ToString() + " : " + trackedImage.transform.position.y.ToString();
+            trackedObject.transform.position = trackedImage.transform.position;
+            trackedObject.transform.rotation = trackedImage.transform.rotation;
+            trackedObject.SetActive(true);
         }
         else
         {
