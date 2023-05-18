@@ -19,7 +19,7 @@ public class MultipleImageTracking : MonoBehaviour
     private void Awake()
     {
         ARTrackedImageManager = GetComponent<ARTrackedImageManager>();
-        margin = 100f;
+        margin = 0.5f;
         //Debug.Log(margin);
         foreach (GameObject prefab in Objs)
         {
@@ -60,18 +60,26 @@ public class MultipleImageTracking : MonoBehaviour
     private void UpdateImage(ARTrackedImage trackedImage)
     {
         GameObject trackedObject = spawnedObjs[trackedImage.referenceImage.name];
-
+        bool objectSetActive = false;
 
         if (trackedImage.trackingState == TrackingState.Tracking)
         {
             PositionCheck.text = trackedImage.transform.position.x.ToString() + " : " + trackedImage.transform.position.y.ToString();
-            trackedObject.transform.position = trackedImage.transform.position;
-            trackedObject.transform.rotation = trackedImage.transform.rotation;
-            trackedObject.SetActive(true);
+            if (blueprint.transform.position.x <= trackedImage.transform.position.x + margin && blueprint.transform.position.x >= trackedImage.transform.position.x - margin && blueprint.transform.position.y <= trackedImage.transform.position.y + margin && blueprint.transform.position.y >= trackedImage.transform.position.y - margin)
+            {
+                objectSetActive = true;
+            }
+            if (objectSetActive)
+            {
+                trackedObject.transform.position = trackedImage.transform.position;
+                trackedObject.transform.rotation = trackedImage.transform.rotation;
+                trackedObject.SetActive(true);
+            }
         }
         else
         {
             trackedObject.SetActive(false);
+            objectSetActive = false;
         }
     }
 }
