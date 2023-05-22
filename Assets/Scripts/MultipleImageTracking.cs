@@ -4,36 +4,35 @@ using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 using UnityEngine.UI;
-
 public class MultipleImageTracking : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject[] Objs;
-
+    public GameObject[] Objs;
     private Dictionary<string, GameObject> spawnedObjs = new Dictionary<string, GameObject>();
     private ARTrackedImageManager ARTrackedImageManager;
-
-    public Image blueprint;
+    public Text ImagePosition;
     public float margin;
-    public Text PositionCheck;
-
-    bool ImagePositionCorrect;
-    bool a;
+    private bool IsCorrect;
+    public Text countdown;
+    private float setTime;
+    public Image blueprint;
     private void Awake()
     {
         ARTrackedImageManager = GetComponent<ARTrackedImageManager>();
-        margin = 0.5f;
-        ImagePositionCorrect = false;
-        a = false;
-        //Debug.Log(margin);
         foreach (GameObject prefab in Objs)
         {
             GameObject clone = Instantiate(prefab);
             spawnedObjs.Add(prefab.name, clone);
             clone.SetActive(false);
         }
+        margin = 0.05f;
+        IsCorrect = false;
+        setTime = 3.0f;
     }
 
+    private void Update()
+    {
+        countdown.text = setTime.ToString();
+    }
     void OnEnable()
     {
         ARTrackedImageManager.trackedImagesChanged += OnTrackedImagesChanged;
@@ -44,44 +43,21 @@ public class MultipleImageTracking : MonoBehaviour
         ARTrackedImageManager.trackedImagesChanged -= OnTrackedImagesChanged;
     }
 
-    private void Update()
-    {
-        if (blueprint.transform.position.x < margin && blueprint.transform.position.x > -margin && blueprint.transform.position.y < margin && blueprint.transform.position.y > -margin)
-        {
-            ImagePositionCorrect = true;
-        }
-        else
-        {
-            ImagePositionCorrect = false;
-        }
-    }
     void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs eventArgs)
     {
         foreach (var trackedImage in eventArgs.added)
         {
-            if (ImagePositionCorrect)
-            {
-                a = true;
-            }
+            UpdateImage(trackedImage);
         }
 
         foreach (var trackedImage in eventArgs.updated)
         {
-            if (ImagePositionCorrect)
-            {
-                a = true;
-                UpdateImage(trackedImage);
-            }
-            else if (a)
-            {
-                UpdateImage(trackedImage);
-            }
+            UpdateImage(trackedImage);
         }
 
         foreach (var trackedImage in eventArgs.removed)
         {
             spawnedObjs[trackedImage.name].SetActive(false);
-            a = false;
         }
     }
 
@@ -89,9 +65,26 @@ public class MultipleImageTracking : MonoBehaviour
     {
         GameObject trackedObject = spawnedObjs[trackedImage.referenceImage.name];
 
-        PositionCheck.text = trackedImage.transform.position.x.ToString() + " : " + trackedImage.transform.position.y.ToString();
+        float ImageX = trackedImage.transform.position.x;
+        float ImageY = trackedImage.transform.position.y;
+        float blueX = blueprint.transform.position.x;
+        float blueY = blueprint.transform.position.y;
 
+        ImagePosition.text = ImageX.ToString() + " : " + ImageY.ToString() + "\n" +
+                             blueX.ToString() +    " : " + blueY.ToString();
+        
+        // 이미지랑 청사진 위치 맞아햐함 //그다음에 맞는 이미지 인지 확인
         if (trackedImage.trackingState == TrackingState.Tracking)
+        {
+            IsCorrect = CountDown();
+        }
+        else
+        {
+            setTime = 3.0f;
+            IsCorrect = false;
+        }
+
+        if (IsCorrect)
         {
             trackedObject.transform.position = trackedImage.transform.position;
             trackedObject.transform.rotation = trackedImage.transform.rotation;
@@ -100,6 +93,20 @@ public class MultipleImageTracking : MonoBehaviour
         else
         {
             trackedObject.SetActive(false);
+        }
+    }
+
+    bool CountDown()
+    {
+        if (setTime > 0)
+        {
+            setTime -= Time.deltaTime;
+            return false;
+        }
+        else
+        {
+            setTime = 0f;
+            return true;
         }
     }
 }
