@@ -9,12 +9,18 @@ public class MultipleImageTracking : MonoBehaviour
     public GameObject[] Objs;
     private Dictionary<string, GameObject> spawnedObjs = new Dictionary<string, GameObject>();
     private ARTrackedImageManager ARTrackedImageManager;
+
     public Text ImagePosition;
     public float margin;
     private bool IsCorrect;
     public Text countdown;
+    public Text TrackedImageName;
     private float setTime;
     public Image blueprint;
+    public string[] blueprintNames;
+    public int printnum;
+    private string ImageName;
+    
     private void Awake()
     {
         ARTrackedImageManager = GetComponent<ARTrackedImageManager>();
@@ -33,6 +39,7 @@ public class MultipleImageTracking : MonoBehaviour
     {
         countdown.text = setTime.ToString();
     }
+
     void OnEnable()
     {
         ARTrackedImageManager.trackedImagesChanged += OnTrackedImagesChanged;
@@ -43,6 +50,7 @@ public class MultipleImageTracking : MonoBehaviour
         ARTrackedImageManager.trackedImagesChanged -= OnTrackedImagesChanged;
     }
 
+    // 매 프레임 마다 호출 되는 함수
     void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs eventArgs)
     {
         foreach (var trackedImage in eventArgs.added)
@@ -63,32 +71,36 @@ public class MultipleImageTracking : MonoBehaviour
 
     private void UpdateImage(ARTrackedImage trackedImage)
     {
-        GameObject trackedObject = spawnedObjs[trackedImage.referenceImage.name];
+        ImageName = trackedImage.referenceImage.name;
+        GameObject trackedObject = spawnedObjs[ImageName];
 
+        //이미지 위치 및 청사진 위치 받아오기
         float ImageX = trackedImage.transform.position.x;
         float ImageY = trackedImage.transform.position.y;
         float blueX = blueprint.transform.position.x;
         float blueY = blueprint.transform.position.y;
 
+        //출력
         ImagePosition.text = ImageX.ToString() + " : " + ImageY.ToString() + "\n" +
-                             blueX.ToString() +    " : " + blueY.ToString();
+                             blueX.ToString() + " : " + blueY.ToString() + "\n" +
+                             blueprintNames[printnum].ToString();
+
         
         // 이미지랑 청사진 위치 맞아햐함 //그다음에 맞는 이미지 인지 확인
         if (trackedImage.trackingState == TrackingState.Tracking)
         {
-            IsCorrect = CountDown();
-        }
-        else
-        {
-            setTime = 3.0f;
-            IsCorrect = false;
-        }
+            if(blueprintNames[printnum] == ImageName)
+            {
+                TrackedImageName.text = trackedImage.referenceImage.name;
+                trackedObject.transform.position = trackedImage.transform.position;
+                trackedObject.transform.rotation = trackedImage.transform.rotation;
+                trackedObject.SetActive(true);
 
-        if (IsCorrect)
-        {
-            trackedObject.transform.position = trackedImage.transform.position;
-            trackedObject.transform.rotation = trackedImage.transform.rotation;
-            trackedObject.SetActive(true);
+            }
+            else
+            {
+                trackedObject.SetActive(false);
+            }
         }
         else
         {
@@ -108,5 +120,10 @@ public class MultipleImageTracking : MonoBehaviour
             setTime = 0f;
             return true;
         }
+    }
+
+    public void ChangePrintNum(int num)
+    {
+        printnum = num;
     }
 }

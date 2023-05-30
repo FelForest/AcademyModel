@@ -27,3 +27,13 @@ MonoBehaviour:
     m_SpecifySize: 1
     m_Name: cat
     m_Texture: {fileID: 0}
+  - m_SerializedGuid:
+      m_GuidLow: 5305898348203081623
+      m_GuidHigh: 14530039015360104076
+    m_SerializedTextureGuid:
+      m_GuidLow: 7040303714485163446
+      m_GuidHigh: 2095954565464558329
+    m_Size: {x: 0.3, y: 0.18697184}
+    m_SpecifySize: 1
+    m_Name: dog
+    m_Texture: {fileID: 0}
