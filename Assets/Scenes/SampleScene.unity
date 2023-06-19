@@ -833,6 +833,7 @@ MonoBehaviour:
   Objs:
   - {fileID: 3270464014283591885, guid: 7daded50c77970242b6f00e254464ddb, type: 3}
   - {fileID: 7447545107643655428, guid: df682fbdd03933b4c952d4a98dd8c3d3, type: 3}
+  - {fileID: 8639430925909959995, guid: a686aff677b83af498fd05edeae5fa13, type: 3}
   blueprintNames:
   - plane
   - ship

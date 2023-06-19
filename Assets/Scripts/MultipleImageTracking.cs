@@ -14,9 +14,11 @@ public class MultipleImageTracking : MonoBehaviour
     public string[] blueprintNames;
     public int printnum;
     private string ImageName;
-    
+    private bool cloudstart;
+
     private void Awake()
     {
+        cloudstart = false;
         ARTrackedImageManager = GetComponent<ARTrackedImageManager>();
         foreach (GameObject prefab in Objs)
         {
@@ -59,10 +61,9 @@ public class MultipleImageTracking : MonoBehaviour
     {
         ImageName = trackedImage.referenceImage.name;
         GameObject trackedObject = spawnedObjs[ImageName];
-
-        //이미지 위치 및 청사진 위치 받아오기
-        float ImageX = trackedImage.transform.position.x;
-        float ImageY = trackedImage.transform.position.y;    
+        GameObject cloud = spawnedObjs["cloud"];
+        float moveSpeed = 0.1f;
+        
         // 이미지랑 청사진 위치 맞아햐함 //그다음에 맞는 이미지 인지 확인
         if (trackedImage.trackingState == TrackingState.Tracking)
         {
@@ -71,21 +72,43 @@ public class MultipleImageTracking : MonoBehaviour
                 trackedObject.transform.position = trackedImage.transform.position;
                 trackedObject.transform.rotation = trackedImage.transform.rotation;
                 trackedObject.SetActive(true);
+                if (ImageName == "ship")
+                {
+                    if (!cloudstart)
+                    {
+                        cloud.transform.position = trackedObject.transform.position;
+                        cloud.transform.rotation = trackedObject.transform.rotation;
+                        cloud.SetActive(true);
+                        cloudstart = true;
+                    }
+                    cloud.transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
+                }
+                else
+                {
+                    cloud.SetActive(false);
+                    cloudstart = false;
+                }
+                
 
             }
             else
             {
                 trackedObject.SetActive(false);
+                cloud.SetActive(false);
+                cloudstart = false;
             }
         }
         else
         {
             trackedObject.SetActive(false);
+            cloud.SetActive(false);
+            cloudstart = false;
         }
     }
 
     public void ChangePrintNum(int num)
     {
         printnum = num;
+        cloudstart = false;
     }
 }
