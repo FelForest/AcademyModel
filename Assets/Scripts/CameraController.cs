@@ -5,38 +5,37 @@ using System.IO;
 
 public class CameraController : MonoBehaviour
 {
-    public Canvas canvas;
-    public void CaptureScreenshot()
+    public GameObject canvas;
+
+    public void CaptureAndSaveScreenshot()
     {
-        StartCoroutine(CaptureScreenshotCoroutine());
+        StartCoroutine(TakeScreenshot());
     }
 
-    private IEnumerator CaptureScreenshotCoroutine()
+    private IEnumerator TakeScreenshot()
     {
-        canvas.enabled = false;
         yield return new WaitForEndOfFrame();
-        canvas.enabled = true;
 
-        // 스크린샷 캡처
-        Texture2D screenshotTexture = ScreenCapture.CaptureScreenshotAsTexture();
+        // 스크린 크기 만큼의 Texture2D를 생성
+        Texture2D screenshotTexture = new Texture2D(Screen.width, Screen.height, TextureFormat.RGB24, false);
 
-        // Texture2D를 PNG 파일로 저장
-        string filename = "AR_Screenshot_" + System.DateTime.Now.ToString("yyyyMMddHHmmss") + ".png";
-        string imagePath = Path.Combine(Application.persistentDataPath, filename);
-        File.WriteAllBytes(imagePath, screenshotTexture.EncodeToPNG());
+        // 생성한 Texture2D에 현재 화면 캡처
+        screenshotTexture.ReadPixels(new Rect(0, 0, Screen.width, Screen.height), 0, 0);
+        screenshotTexture.Apply();
 
-        // 갤러리로 복사
-        NativeGallery.Permission permission = NativeGallery.SaveImageToGallery(imagePath, "MyAlbum", filename);
-        if (permission == NativeGallery.Permission.Granted)
+        // 이미지를 갤러리에 저장
+        NativeGallery.Permission permission = NativeGallery.SaveImageToGallery(screenshotTexture, "MyApp", "Screenshot.png", (success, path) =>
         {
-            Debug.Log("스크린샷이 저장되었습니다. 경로: " + imagePath);
-        }
-        else
-        {
-            Debug.Log("저장 권한이 없습니다.");
-        }
+            if (success)
+            {
+                Debug.Log("스크린샷이 갤러리에 저장되었습니다. 경로: " + path);
+            }
+            else
+            {
+                Debug.LogError("스크린샷 저장 실패");
+            }
+        });
 
-        // 파일 삭제
-        File.Delete(imagePath);
+        Debug.Log("갤러리 권한 상태: " + permission);
     }
 }

@@ -27,7 +27,7 @@ MonoBehaviour:
       m_GuidHigh: 10707933575030728456
     m_Size: {x: 0.4392687, y: 0.3}
     m_SpecifySize: 1
-    m_Name: cat
+    m_Name: plane
     m_Texture: {fileID: 0}
   - m_SerializedGuid:
       m_GuidLow: 5305898348203081623
@@ -37,5 +37,5 @@ MonoBehaviour:
       m_GuidHigh: 2095954565464558329
     m_Size: {x: 0.3, y: 0.18697184}
     m_SpecifySize: 1
-    m_Name: dog
+    m_Name: ship
     m_Texture: {fileID: 0}
