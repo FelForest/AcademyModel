@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.IO;
 
 public class CameraController : MonoBehaviour
 {
@@ -14,6 +13,7 @@ public class CameraController : MonoBehaviour
 
     private IEnumerator TakeScreenshot()
     {
+        canvas.SetActive(false);
         yield return new WaitForEndOfFrame();
 
         // 스크린 크기 만큼의 Texture2D를 생성
@@ -24,18 +24,9 @@ public class CameraController : MonoBehaviour
         screenshotTexture.Apply();
 
         // 이미지를 갤러리에 저장
-        NativeGallery.Permission permission = NativeGallery.SaveImageToGallery(screenshotTexture, "MyApp", "Screenshot.png", (success, path) =>
-        {
-            if (success)
-            {
-                Debug.Log("스크린샷이 갤러리에 저장되었습니다. 경로: " + path);
-            }
-            else
-            {
-                Debug.LogError("스크린샷 저장 실패");
-            }
-        });
+        NativeGallery.SaveImageToGallery(screenshotTexture, "MyApp", "Screenshot.png");
 
-        Debug.Log("갤러리 권한 상태: " + permission);
+        
+        canvas.SetActive(true);
     }
 }

@@ -10,7 +10,6 @@ public class MultipleImageTracking : MonoBehaviour
     private Dictionary<string, GameObject> spawnedObjs = new Dictionary<string, GameObject>();
     private ARTrackedImageManager ARTrackedImageManager;
 
-    private bool IsCorrect;
     public string[] blueprintNames;
     public int printnum;
     private string ImageName;
@@ -62,6 +61,7 @@ public class MultipleImageTracking : MonoBehaviour
         ImageName = trackedImage.referenceImage.name;
         GameObject trackedObject = spawnedObjs[ImageName];
         GameObject cloud = spawnedObjs["cloud"];
+        GameObject sea = spawnedObjs["sea"];
         float moveSpeed = 0.1f;
         
         // 이미지랑 청사진 위치 맞아햐함 //그다음에 맞는 이미지 인지 확인
@@ -72,28 +72,32 @@ public class MultipleImageTracking : MonoBehaviour
                 trackedObject.transform.position = trackedImage.transform.position;
                 trackedObject.transform.rotation = trackedImage.transform.rotation;
                 trackedObject.SetActive(true);
-                if (ImageName == "ship")
+
+                sea.transform.position = trackedObject.transform.position;
+                sea.transform.rotation = trackedObject.transform.rotation * Quaternion.Euler(-90f, 0f, 0f);
+                sea.SetActive(true);
+
+                if (!cloudstart)
                 {
-                    if (!cloudstart)
-                    {
-                        cloud.transform.position = trackedObject.transform.position;
-                        cloud.transform.rotation = trackedObject.transform.rotation;
-                        cloud.SetActive(true);
-                        cloudstart = true;
-                    }
-                    cloud.transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
-                }
-                else
-                {
-                    cloud.SetActive(false);
-                    cloudstart = false;
+                    cloud.transform.position = trackedObject.transform.position + new Vector3(0f,0f,1f);
+                    cloud.transform.rotation = trackedObject.transform.rotation;
+                    cloud.SetActive(true);
                 }
                 
 
+                if (blueprintNames[printnum] == "ship")
+                {
+                    cloud.transform.Translate(Vector3.right * moveSpeed * Time.deltaTime);
+                }
+                if(blueprintNames[printnum] == "plane")
+                {
+                    cloud.transform.Translate(Vector3.back * moveSpeed * Time.deltaTime);
+                }
             }
             else
             {
                 trackedObject.SetActive(false);
+                sea.SetActive(false);
                 cloud.SetActive(false);
                 cloudstart = false;
             }
@@ -101,6 +105,7 @@ public class MultipleImageTracking : MonoBehaviour
         else
         {
             trackedObject.SetActive(false);
+            sea.SetActive(false);
             cloud.SetActive(false);
             cloudstart = false;
         }
